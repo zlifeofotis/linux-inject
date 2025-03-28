@@ -165,8 +165,11 @@ long getlibcaddr(pid_t pid)
 	while(fgets(line, 850, fp) != NULL)
 	{
 		sscanf(line, "%lx-%*lx %*s %*s %*s %*d", &addr);
-		if(strstr(line, "libc-") != NULL)
+		printf("%0lx",addr);
+		if(strstr(line, "libc.so.6") != NULL)
 		{
+			printf("FIND: %s\n",line);
+			printf("FIND ADDR: %0lx\n",addr);
 			break;
 		}
 	}
@@ -233,6 +236,11 @@ long getFunctionAddress(char* funcName)
 {
 	void* self = dlopen("libc.so.6", RTLD_LAZY);
 	void* funcAddr = dlsym(self, funcName);
+	if (funcAddr == NULL){
+		printf("Error: %s\n", dlerror());
+		exit(1);
+	}
+	dlclose(self);
 	return (long)funcAddr;
 }
 

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <dlfcn.h>
 
 /*
@@ -11,6 +12,13 @@
 void hello()
 {
 	printf("I just got loaded\n");
+/* 	while (1)
+	{
+		sleep(2);
+		printf("I'm checking\n");
+	} */
+	
+	
 }
 
 /*

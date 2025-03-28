@@ -55,6 +55,7 @@ void ptrace_detach(pid_t target)
 		fprintf(stderr, "ptrace(PTRACE_DETACH) failed\n");
 		exit(1);
 	}
+	printf("Detached from %d\n", target);
 }
 
 /*
@@ -92,7 +93,7 @@ void ptrace_getregs(pid_t target, struct REG_TYPE* regs)
  *
  */
 
-void ptrace_cont(pid_t target)
+void ptrace_cont(pid_t target, char* msg)
 {
 	struct timespec* sleeptime = malloc(sizeof(struct timespec));
 
@@ -101,14 +102,14 @@ void ptrace_cont(pid_t target)
 
 	if(ptrace(PTRACE_CONT, target, NULL, NULL) == -1)
 	{
-		fprintf(stderr, "ptrace(PTRACE_CONT) failed\n");
+		fprintf(stderr,"%s: %s", msg, "ptrace(PTRACE_CONT) failed\n");
 		exit(1);
 	}
 
 	nanosleep(sleeptime, NULL);
 
 	// make sure the target process received SIGTRAP after stopping.
-	checktargetsig(target);
+	checktargetsig(target, msg);
 }
 
 /*
@@ -149,12 +150,12 @@ void ptrace_setregs(pid_t target, struct REG_TYPE* regs)
  *
  */
 
-siginfo_t ptrace_getsiginfo(pid_t target)
+siginfo_t ptrace_getsiginfo(pid_t target, char* msg)
 {
 	siginfo_t targetsig;
 	if(ptrace(PTRACE_GETSIGINFO, target, NULL, &targetsig) == -1)
 	{
-		fprintf(stderr, "ptrace(PTRACE_GETSIGINFO) failed\n");
+		fprintf(stderr,"%s: %s",msg, "ptrace(PTRACE_GETSIGINFO) failed\n");
 		exit(1);
 	}
 	return targetsig;
@@ -238,20 +239,21 @@ void ptrace_write(int pid, unsigned long addr, void *vptr, int len)
  *
  */
 
-void checktargetsig(int pid)
+void checktargetsig(int pid, char *msg)
 {
 	// check the signal that the child stopped with.
-	siginfo_t targetsig = ptrace_getsiginfo(pid);
+	siginfo_t targetsig = ptrace_getsiginfo(pid, msg);
 
 	// if it wasn't SIGTRAP, then something bad happened (most likely a
 	// segfault).
 	if(targetsig.si_signo != SIGTRAP)
 	{
-		fprintf(stderr, "instead of expected SIGTRAP, target stopped with signal %d: %s\n", targetsig.si_signo, strsignal(targetsig.si_signo));
-		fprintf(stderr, "sending process %d a SIGSTOP signal for debugging purposes\n", pid);
+		fprintf(stderr, "%s: instead of expected SIGTRAP, target stopped with signal %d: %s\n", msg, targetsig.si_signo, strsignal(targetsig.si_signo));
+		fprintf(stderr, "%s: sending process %d a SIGSTOP signal for debugging purposes\n", msg, pid);
 		ptrace(PTRACE_CONT, pid, NULL, SIGSTOP);
 		exit(1);
 	}
+	printf("OK, target receive signal: %d, %s\n",targetsig.si_signo, msg);
 }
 
 /*

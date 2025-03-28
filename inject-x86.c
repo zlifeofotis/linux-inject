@@ -211,7 +211,7 @@ int main(int argc, char** argv)
 	ptrace_write(target, addr, newcode, injectSharedLibrary_size);
 
 	// now that the new code is in place, let the target run our injected code.
-	ptrace_cont(target);
+	ptrace_cont(target,"Go to malloc()");
 
 	// at this point, the target should have run malloc(). check its return
 	// value to see if it succeeded, and bail out cleanly if it didn't.
@@ -239,7 +239,7 @@ int main(int argc, char** argv)
 	ptrace_write(target, targetBuf, libPath, libPathLength);
 
 	// now call __libc_dlopen_mode() to attempt to load the shared library.
-	ptrace_cont(target);
+	ptrace_cont(target,"Go to dlopen() or __libc_dlopen_mode()");
 
 	// check out what the registers look like after calling
 	// __libc_dlopen_mode.
@@ -271,7 +271,7 @@ int main(int argc, char** argv)
 	// as a courtesy, free the buffer that we allocated inside the target
 	// process. we don't really care whether this succeeds, so don't
 	// bother checking the return value.
-	ptrace_cont(target);
+	ptrace_cont(target,"Go to modify EDI registers before free()");
 
 	// at this point, if everything went according to plan, we've loaded
 	// the shared library inside the target process, so we're done. restore
