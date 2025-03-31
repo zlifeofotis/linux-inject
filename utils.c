@@ -165,11 +165,11 @@ long getlibcaddr(pid_t pid)
 	while(fgets(line, 850, fp) != NULL)
 	{
 		sscanf(line, "%lx-%*lx %*s %*s %*s %*d", &addr);
-		printf("%0lx",addr);
+		printf("0x%0lx\n",addr);
 		if(strstr(line, "libc.so.6") != NULL)
 		{
 			printf("FIND: %s\n",line);
-			printf("FIND ADDR: %0lx\n",addr);
+			printf("FIND ADDR: 0x%0lx\n",addr);
 			break;
 		}
 	}
