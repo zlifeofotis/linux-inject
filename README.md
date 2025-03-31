@@ -53,19 +53,48 @@
 
  * First terminal:
 
-            $ ./sample-target
-            sleeping...
-            sleeping...
-            I just got loaded
-            sleeping...
-            sleeping...
+	$ ./sample-target
+	sleeping...
+	sleeping...
+	sleeping...
+	I just got loaded
+	sleeping...
+	sleeping...
+	sleeping...
+	sleeping...
 
  * Second terminal:
 
-            $ ./inject -n sample-target sample-library.so
-            targeting process "sample-target" with pid 31490
-            library "sample-library.so" successfully injected
-            $
+	$ ./inject -n sample-target sample-library.so
+	targeting process "sample-target" with pid 3578642
+	0x564638833000
+	0x564638834000
+	0x564638836000
+	0x564638837000
+	0x564638838000
+	0x564672e60000
+	0x7faca4435000
+	0x7faca4438000
+	FIND: 7faca4438000-7faca445e000 r--p 00000000 103:05 19976336                  /usr/lib/x86_64-linux-gnu/libc.so.6
+	
+	FIND ADDR: 0x7faca4438000
+	0x555c84ccf000
+	0x555c84cd0000
+	0x555c84cd1000
+	0x555c84cd2000
+	0x555c84cd3000
+	0x555ca9eaf000
+	0x7f12d26a6000
+	0x7f12d26a9000
+	FIND: 7f12d26a9000-7f12d26cf000 r--p 00000000 103:05 19976336                  /usr/lib/x86_64-linux-gnu/libc.so.6
+	
+	FIND ADDR: 0x7f12d26a9000
+	OK, target receive signal: 5, Go to malloc()
+	OK, target receive signal: 5, Go to dlopen() or __libc_dlopen_mode()
+	"sample-library.so" successfully injected
+	OK, target receive signal: 5, Go to modify EDI registers before free()
+	OK, target receive signal: 5, Go to free()
+	Detached from 3578642
 
 * If the injection fails, make sure your machine is configured to allow processes to `ptrace()` other processes that they did not create. See the "Caveat about `ptrace()`" section above.
 
